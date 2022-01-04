@@ -1,4 +1,3 @@
-import { useEffect, useState } from "react";
 import MeetupList from "../components/meetups/MeetupList";
 
 const MEETUPS = [{
@@ -13,14 +12,28 @@ const MEETUPS = [{
   image: 'https://cdnp.flypgs.com/files/Sehirler-long-tail/Lviv/lviv-sehir-meydan.jpg'
 }]
 
-const HomePage = () => {
-  const [meetupList, setMeetupList] = useState([]);
+const HomePage = props => {
+  return <MeetupList meetups={props.meetups} />;
+}
 
-  useEffect(() => {
-    setMeetupList(MEETUPS);
-  }, []);
+// export async function getServerSideProps(context) {
+//   const req = context.req;
+//   const res = context.res;
 
-  return <MeetupList meetups={meetupList} />;
+//   return {
+//     props: {
+//       meetups: MEETUPS
+//     }
+//   }
+// }
+
+export async function getStaticProps() {
+  return {
+    props: {
+      meetups: MEETUPS
+    },
+    revalidate: 3600
+  }
 }
 
 export default HomePage;
