@@ -1,2 +1,3 @@
 # Meetups
-NextJs
+NextJS (ReactJS)
+MongoDB
