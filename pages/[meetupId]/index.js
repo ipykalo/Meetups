@@ -1,3 +1,4 @@
+import { ObjectId, MongoClient } from "mongodb";
 import MeetupDetail from "../../components/meetups/MeetupDetail"
 
 const MeetupsDetailsPage = props => {
@@ -10,32 +11,32 @@ const MeetupsDetailsPage = props => {
 }
 
 export async function getStaticPaths() {
+  const client = await MongoClient.connect('mongodb+srv://ipyka:12457800@cluster0.toaib.mongodb.net/meetups?retryWrites=true&w=majority');
+  const db = client.db();
+  const meetups = await db.collection('meetups').find({}, { _id: 1 }).toArray();
+  const paths = meetups.map(item => ({ params: { meetupId: item._id.toString() } }));
+  client.close();
+
   return {
-    fallback: false,
-    paths: [
-      {
-        params: {
-          meetupId: 'm1'
-        }
-      },
-      {
-        params: {
-          meetupId: 'm2'
-        }
-      }
-    ]
+    paths,
+    fallback: false
   }
 }
 
 export async function getStaticProps(context) {
+  const client = await MongoClient.connect('mongodb+srv://ipyka:12457800@cluster0.toaib.mongodb.net/meetups?retryWrites=true&w=majority');
+  const db = client.db();
+  const meetup = await db.collection('meetups').findOne({ _id: ObjectId(context.params.meetupId) });
+  client.close();
+
   return {
     props: {
       detail: {
-        id: context.params.meetupId,
-        image: 'https://i2.wp.com/girleatworld.net/wp-content/uploads/2017/12/6108ee0e-1bab-4162-98d3-5665437ae13d.jpg?fit=1400%2C1050&ssl=1',
-        title: 'First Meetup',
-        address: 'Some street 5',
-        description: 'Some Description'
+        id: meetup._id.toString(),
+        title: meetup.title,
+        image: meetup.image,
+        address: meetup.address,
+        description: meetup.description
       }
     }
   }
